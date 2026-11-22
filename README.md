@@ -30,7 +30,7 @@ Talab: Linux (Debian da sinalgan), Python 3.10+, [Ollama](https://ollama.com).
    ```
 2. Loyihani oling va virtual muhit yarating:
    ```bash
-   git clone https://github.com/<foydalanuvchi>/lokal-agent1.git
+   git clone https://github.com/nazmiddin255/lokal-agent1.git
    cd lokal-agent1
    python3 -m venv .venv
    .venv/bin/pip install -r requirements.txt
