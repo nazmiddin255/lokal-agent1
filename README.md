@@ -1,4 +1,4 @@
-# Local_model1 — lokal kundalik yordamchi
+# lokal-agent1 — lokal kundalik yordamchi
 
 ![AI yordamida yaratilgan](https://img.shields.io/badge/AI%20yordamida-yaratilgan-blue)
 ![Litsenziya: MIT](https://img.shields.io/badge/litsenziya-MIT-green)
@@ -30,8 +30,8 @@ Talab: Linux (Debian da sinalgan), Python 3.10+, [Ollama](https://ollama.com).
    ```
 2. Loyihani oling va virtual muhit yarating:
    ```bash
-   git clone <repo-manzili> Local_model1
-   cd Local_model1
+   git clone https://github.com/<foydalanuvchi>/lokal-agent1.git
+   cd lokal-agent1
    python3 -m venv .venv
    .venv/bin/pip install -r requirements.txt
    ```
@@ -90,3 +90,17 @@ Yangi alifboda o'girilmaydigan so'zlar `alifbo_istisno.txt` da.
 ## Litsenziya
 
 [MIT](LICENSE)
+
+---
+
+## English
+
+**lokal-agent1** is a small, lightweight local assistant with a browser chat UI. The model runs on your own machine through Ollama, nothing is sent to the internet. You write in Uzbek; it can prepare Word/Excel/PowerPoint files, write code, and create folders and files for you.
+
+- **Requirements:** Linux, Python 3.10+, [Ollama](https://ollama.com) and the model `qwen3:4b-instruct-2507-q4_K_M` (`ollama pull qwen3:4b-instruct-2507-q4_K_M`; the model is not in this repo).
+- **Install:** `python3 -m venv .venv && .venv/bin/pip install -r requirements.txt`
+- **Run:** `./ishga_tushir.sh`, then open http://127.0.0.1:5000 (the server listens on localhost only).
+- **Safety:** the agent works only inside the `ish/` folder (`..`, absolute paths and escaping symlinks are rejected); there is no delete tool; every write action (create folder/file, make document, run Python) needs your Yes/No approval first.
+- **Limitations:** slow on CPU (tens of seconds per answer); the small 4B model is weak at long Uzbek text, so always review generated documents; `run_python` is not a full sandbox; the built-in Flask server is for a single local user only.
+
+Created with AI assistance (Claude Code); reviewed and tested by the author. Licensed under MIT.

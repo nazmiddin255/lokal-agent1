@@ -17,3 +17,6 @@ models/
 *.log
 *.tmp
 .claude/
+
+# Ichki ish holati yozuvi
+HOLAT.md
