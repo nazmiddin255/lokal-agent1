@@ -1,0 +1,19 @@
+# Virtual muhit va keshlar
+.venv/
+__pycache__/
+*.pyc
+
+# Shaxsiy ma'lumotlar: ish papkasi, chatlar, xotira
+ish/
+data/
+
+# Model fayllari (Ollama o'zi yuklaydi)
+*.gguf
+*.safetensors
+*.bin
+models/
+
+# Loglar va vaqtinchalik fayllar
+*.log
+*.tmp
+.claude/

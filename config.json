@@ -1,0 +1,17 @@
+{
+  "model": "qwen3:4b-instruct-2507-q4_K_M",
+  "ollama_url": "http://localhost:11434",
+  "ish_papka": "ish",
+  "host": "127.0.0.1",
+  "port": 5000,
+  "keep_alive": "5m",
+  "options": {
+    "temperature": 0.7,
+    "top_p": 0.8,
+    "top_k": 20,
+    "repeat_penalty": 1.1,
+    "num_ctx": 4096
+  },
+  "python_vaqt_chegarasi": 30,
+  "max_qadam": 8
+}

@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yordamchi</title>
+<style>
+:root{
+  --bg:#f6f7f9; --panel:#ffffff; --matn:#1d2330; --xira:#6b7280; --chiziq:#e3e6eb;
+  --asosiy:#2563eb; --asosiy-m:#ffffff; --men:#e8f0fe; --kod:#f2f4f7; --yashil:#15803d;
+  --qizil:#b91c1c; --sariq:#fff7e0; --sariq-ch:#e9c46a;
+}
+:root[data-tema="tun"]{
+  --bg:#14171c; --panel:#1c2027; --matn:#e6e8eb; --xira:#9aa3af; --chiziq:#2c323c;
+  --asosiy:#4c8dff; --asosiy-m:#0b1020; --men:#22314d; --kod:#11141a; --yashil:#4ade80;
+  --qizil:#f87171; --sariq:#2e2715; --sariq-ch:#8a6d1f;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--matn);font:15px/1.5 system-ui,"Noto Sans","DejaVu Sans",sans-serif;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--panel);border-bottom:1px solid var(--chiziq);flex-wrap:wrap}
+header h1{font-size:17px;margin:0 auto 0 0;font-weight:600}
+header .holat{font-size:12px;color:var(--xira);margin-right:6px}
+button{font:inherit;border:1px solid var(--chiziq);background:var(--panel);color:var(--matn);border-radius:8px;padding:6px 12px;cursor:pointer}
+button:hover{border-color:var(--asosiy)}
+button:disabled{opacity:.45;cursor:default}
+button.asosiy{background:var(--asosiy);border-color:var(--asosiy);color:var(--asosiy-m)}
+button.yoqilgan{border-color:var(--asosiy);color:var(--asosiy);font-weight:600}
+button.asosiy.yoqilgan{color:var(--asosiy-m)}
+main{flex:1;display:flex;min-height:0}
+#chat{flex:1;overflow-y:auto;padding:18px 14px}
+.ichki{max-width:820px;margin:0 auto}
+.xabar{margin:10px 0;padding:10px 14px;border-radius:12px;background:var(--panel);border:1px solid var(--chiziq);white-space:pre-wrap;word-wrap:break-word}
+.xabar.men{background:var(--men);border-color:transparent;margin-left:15%}
+.xabar.vosita{font-size:13px;color:var(--yashil);background:transparent;border:1px dashed var(--chiziq);padding:6px 12px}
+.xabar.vosita.xato,.xabar.xato{color:var(--qizil)}
+.xabar.ogoh{font-size:13px;color:var(--xira);background:transparent;border:none;padding:2px 14px}
+.xabar pre{white-space:pre;overflow-x:auto;background:var(--kod);border:1px solid var(--chiziq);border-radius:8px;padding:10px;margin:8px 0;position:relative;font-size:13px}
+.xabar code{font-family:ui-monospace,"DejaVu Sans Mono",monospace;font-size:13px}
+.xabar :not(pre)>code{background:var(--kod);padding:1px 5px;border-radius:5px}
+.nusxa{position:absolute;top:6px;right:6px;font-size:12px;padding:2px 8px}
+.tasdiq{background:var(--sariq);border:1px solid var(--sariq-ch);border-radius:12px;padding:12px 14px;margin:10px 0}
+.tasdiq b{display:block;margin-bottom:6px}
+.tasdiq pre{max-height:220px;overflow:auto;background:var(--kod);border-radius:8px;padding:8px;font-size:12px;white-space:pre-wrap;margin:6px 0}
+.tasdiq .ogoh{color:var(--qizil);font-weight:600;margin:6px 0}
+.tasdiq .tugmalar{display:flex;gap:8px;margin-top:8px}
+.kutish{color:var(--xira);font-size:13px;padding:4px 14px}
+.kutish::after{content:"…";animation:n 1.2s infinite}
+@keyframes n{0%{opacity:.2}50%{opacity:1}100%{opacity:.2}}
+footer{padding:10px 14px;background:var(--panel);border-top:1px solid var(--chiziq)}
+footer .ichki{display:flex;gap:8px;align-items:flex-end}
+textarea{flex:1;resize:none;font:inherit;padding:9px 12px;border-radius:10px;border:1px solid var(--chiziq);background:var(--bg);color:var(--matn);max-height:200px;min-height:42px;overflow-y:hidden}
+textarea:focus{outline:none;border-color:var(--asosiy)}
+#fayllar{width:300px;border-left:1px solid var(--chiziq);background:var(--panel);overflow-y:auto;padding:10px;display:none;font-size:13px}
+#fayllar.ochiq{display:block}
+#fayllar h3{margin:4px 0 8px;font-size:14px;display:flex;justify-content:space-between;align-items:center}
+#fayllar .yol{color:var(--xira);font-size:11px;word-break:break-all;margin-bottom:8px}
+.f{padding:2px 4px;border-radius:5px;cursor:default;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f.fayl{cursor:pointer}
+.f.fayl:hover{background:var(--men)}
+#korish{white-space:pre-wrap;background:var(--kod);border-radius:8px;padding:8px;font-family:ui-monospace,monospace;font-size:12px;max-height:45vh;overflow:auto;display:none;margin-top:8px}
+.bosh{color:var(--xira);text-align:center;margin-top:12vh}
+#loyihalar{width:250px;border-right:1px solid var(--chiziq);background:var(--panel);overflow-y:auto;padding:10px;font-size:13px;display:none;flex-direction:column;gap:8px}
+#loyihalar.ochiq{display:flex}
+#loyihalar select,#loyihalar input{width:100%;font:inherit;padding:6px 8px;border-radius:8px;border:1px solid var(--chiziq);background:var(--bg);color:var(--matn);min-width:0}
+#loyihalar h3{margin:4px 0 0;font-size:14px;display:flex;justify-content:space-between}
+#loyihalar h3 span{color:var(--xira);font-weight:400}
+.qator{display:flex;gap:6px}
+.yop{display:none;padding:2px 9px}
+.ch{padding:6px 8px;border-radius:8px;cursor:pointer;border:1px solid transparent;overflow:hidden}
+.ch:hover{background:var(--men)}
+.ch.joriy{border-color:var(--asosiy);background:var(--men)}
+.ch div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ch small{display:block;color:var(--xira);font-size:11px}
+#kontekst{font-size:12px;color:var(--xira)}
+#kontekst.to{color:var(--qizil);font-weight:600}
+.son{font-size:12px;color:var(--xira)}
+.son.qizil{color:var(--qizil);font-weight:600}
+.modal-fon{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:10}
+.modal-fon.ochiq{display:flex}
+.modal{background:var(--panel);border-radius:12px;padding:16px;width:min(640px,94vw);max-height:90vh;overflow:auto}
+.modal h3{margin:10px 0 4px;font-size:14px}
+.modal textarea{width:100%;min-height:110px;max-height:none;font-size:13px;overflow-y:auto}
+.modal .qator{align-items:center;margin-top:4px}
+#korish a{color:var(--asosiy)}
+@media (max-width:700px){.yop{display:inline-block}#loyihalar{position:fixed;left:0;top:0;bottom:0;width:85%;z-index:5}#fayllar{position:fixed;right:0;top:0;bottom:0;width:85%;z-index:5}.xabar.men{margin-left:5%}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Yordamchi</h1>
+  <span class="holat" id="holat">tekshirilmoqda…</span>
+  <span id="kontekst" title="Modelga berilayotgan matn hajmi (taxminan)"></span>
+  <button id="b-loyiha">Loyihalar</button>
+  <button id="b-xulosa" title="Eski xabarlarni qisqa xulosaga aylantirib loyiha xulosasiga qo'shadi">Xulosa qil</button>
+  <button id="b-xotira" title="Umumiy xotira va loyiha xulosasini tahrirlash">Xotira</button>
+  <button id="b-alifbo" title="Javoblarni yangi alifboda (ş ç ö ğ) ko'rsatish">Yangi alifbo</button>
+  <button id="b-tema" title="Kun / Tun rejimi">Tun</button>
+  <button id="b-fayllar">Fayllar</button>
+  <button id="b-yangi">Yangi suhbat</button>
+</header>
+<main>
+  <aside id="loyihalar">
+    <h3>Loyiha <button class="yop" id="l-yop" title="Yopish">✕</button></h3>
+    <select id="l-tanla"></select>
+    <div class="qator"><input id="l-nom" placeholder="Yangi loyiha nomi" maxlength="40"><button id="l-yarat" title="Loyiha yaratish">+</button></div>
+    <div class="son qizil" id="l-xato"></div>
+    <h3>Suhbatlar <span id="l-son"></span></h3>
+    <div id="l-chatlar"></div>
+  </aside>
+  <div id="chat"><div class="ichki" id="log"><div class="bosh" id="bosh">Salom! Savolingizni yozing.<br>Masalan: <i>“test papka yarat, ichiga hello.txt ga Salom yoz”</i></div></div></div>
+  <aside id="fayllar">
+    <h3>Ish papkasi <span><button id="b-yangila" title="Yangilash">↻</button> <button class="yop" id="f-yop" title="Yopish">✕</button></span></h3>
+    <div class="yol" id="ish-yol"></div>
+    <div id="royxat"></div>
+    <div id="korish"></div>
+  </aside>
+</main>
+<footer>
+  <div class="ichki">
+    <textarea id="kirish" rows="1" placeholder="Xabar yozing… (Enter — yuborish, Shift+Enter — yangi qator)"></textarea>
+    <button id="b-toxtat" disabled>To'xtatish</button>
+    <button id="b-yubor" class="asosiy">Yuborish</button>
+  </div>
+</footer>
+<div class="modal-fon" id="modal"><div class="modal">
+  <h3>Umumiy xotira <span class="son" id="n-umumiy"></span></h3>
+  <div class="son">Doimiy qoidalar. Har suhbatda modelga beriladi. Ko'pi bilan 200 so'z.</div>
+  <textarea id="t-umumiy"></textarea>
+  <div class="qator"><button id="s-umumiy" class="asosiy">Saqlash</button><span class="son" id="m-umumiy"></span></div>
+  <h3>Loyiha xulosasi: <span id="m-nom"></span> <span class="son" id="n-loyiha"></span></h3>
+  <div class="son">Loyiha haqida qisqa yozuv (inglizcha bo'lishi mumkin). «Xulosa qil» shu yerga qo'shadi. Ko'pi bilan 300 so'z.</div>
+  <textarea id="t-loyiha"></textarea>
+  <div class="qator"><button id="s-loyiha" class="asosiy">Saqlash</button><span class="son" id="m-loyiha"></span></div>
+  <div class="qator" style="justify-content:flex-end;margin-top:10px"><button id="m-yop">Yopish</button></div>
+</div></div>
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const saq={ol(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},yoz(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+let sid;try{sid=sessionStorage.getItem("sid")}catch(e){}
+if(!sid){sid=Math.random().toString(36).slice(2)+Date.now().toString(36);try{sessionStorage.setItem("sid",sid)}catch(e){}}
+
+let alifbo=saq.ol("alifbo","0")==="1";
+let tema=saq.ol("tema","kun");
+let ishlayapti=false, boshqaruv=null, joriy=null, joriyMatn="";
+let loyiha=saq.ol("loyiha",""), chatId=null;
+try{chatId=sessionStorage.getItem("chatId")||null}catch(e){}
+
+function temaQoy(){document.documentElement.dataset.tema=tema;$("b-tema").textContent=tema==="tun"?"Kun":"Tun"}
+function alifboQoy(){const b=$("b-alifbo");b.classList.toggle("yoqilgan",alifbo);b.textContent=alifbo?"Yangi alifbo: yoq":"Yangi alifbo";}
+temaQoy();alifboQoy();
+$("b-tema").onclick=()=>{tema=tema==="tun"?"kun":"tun";saq.yoz("tema",tema);temaQoy()};
+$("b-alifbo").onclick=()=>{alifbo=!alifbo;saq.yoz("alifbo",alifbo?"1":"0");alifboQoy()};
+
+function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function inline(s){
+  return esc(s).replace(/`([^`\n]+)`/g,"<code>$1</code>")
+    .replace(/\*\*([^*\n]+)\*\*/g,"<b>$1</b>")
+    .replace(/^#{1,6} (.*)$/gm,"<b>$1</b>");
+}
+function md(t){
+  const q=t.split("```");let h="";
+  for(let i=0;i<q.length;i++){
+    if(i%2===0){h+=inline(q[i]);}
+    else{let k=q[i];const nl=k.indexOf("\n");if(nl>=0&&/^[\w+#.-]*$/.test(k.slice(0,nl).trim()))k=k.slice(nl+1);
+      h+='<pre><button class="nusxa">Nusxa</button><code>'+esc(k.replace(/\n$/,""))+"</code></pre>";}
+  }
+  return h;
+}
+document.addEventListener("click",e=>{
+  if(e.target.classList.contains("nusxa")){
+    const c=e.target.parentNode.querySelector("code").textContent;
+    const ok=()=>{e.target.textContent="Olindi ✓";setTimeout(()=>e.target.textContent="Nusxa",1200)};
+    if(navigator.clipboard)navigator.clipboard.writeText(c).then(ok,()=>{});
+  }
+});
+
+const log=$("log"),chat=$("chat");
+function pastga(){chat.scrollTop=chat.scrollHeight}
+function qosh(cls,html){const b=$("bosh");if(b)b.remove();const d=document.createElement("div");d.className=cls;if(html!==undefined)d.innerHTML=html;log.appendChild(d);pastga();return d}
+let kutishEl=null;
+function kutish(on){if(on&&!kutishEl){kutishEl=qosh("kutish");kutishEl.textContent="Model o'ylayapti"}else if(!on&&kutishEl){kutishEl.remove();kutishEl=null}}
+let rejaBor=false;
+function chiz(){rejaBor=false;if(joriy){joriy.innerHTML=md(joriyMatn);pastga()}}
+function matnQosh(v,almashtir){
+  if(!joriy){kutish(false);joriy=qosh("xabar model");joriyMatn=""}
+  joriyMatn=almashtir?v:joriyMatn+v;
+  if(!rejaBor){rejaBor=true;requestAnimationFrame(chiz)}
+}
+function yop(){if(joriy){chiz();joriy=null;joriyMatn=""}}
+
+function holatQoy(on){ishlayapti=on;$("b-yubor").disabled=on;$("b-toxtat").disabled=!on;if(!on)kutish(false)}
+
+async function oqim(url,tana){
+  holatQoy(true);kutish(true);
+  boshqaruv=new AbortController();
+  let tasdiqBor=false;
+  try{
+    const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(tana),signal:boshqaruv.signal});
+    if(!r.ok){let j={};try{j=await r.json()}catch(e){}
+      if(j.limit){limitKarta(url,tana,j)}else qosh("xabar xato").textContent=j.xato||"Xato";return}
+    const o=r.body.getReader(),dek=new TextDecoder();let bufer="";
+    for(;;){
+      const {value,done}=await o.read();if(done)break;
+      bufer+=dek.decode(value,{stream:true});
+      let i;while((i=bufer.indexOf("\n"))>=0){
+        const q=bufer.slice(0,i);bufer=bufer.slice(i+1);if(!q.trim())continue;
+        let h;try{h=JSON.parse(q)}catch(e){continue}
+        if(h.t==="matn")matnQosh(h.v);
+        else if(h.t==="almashtir")matnQosh(h.v,true);
+        else if(h.t==="vosita"){yop();kutish(false);qosh("xabar vosita"+(h.xato?" xato":"")).textContent=h.v;kutish(true)}
+        else if(h.t==="tasdiq"){yop();kutish(false);tasdiqBor=true;tasdiqKarta(h)}
+        else if(h.t==="xato"){yop();kutish(false);qosh("xabar xato").textContent=h.v}
+        else if(h.t==="ogoh"){yop();qosh("xabar ogoh").textContent=h.v}
+        else if(h.t==="chat"){chatIdQoy(h.id);chatlarniYukla()}
+        else if(h.t==="kontekst"){kontekstQoy({n:h.n,chegara:h.chegara})}
+      }
+    }
+  }catch(e){
+    if(e.name!=="AbortError")qosh("xabar xato").textContent="Server bilan aloqa uzildi.";
+  }finally{
+    yop();holatQoy(false);boshqaruv=null;
+    if(tasdiqBor)$("b-yubor").disabled=false;
+    if($("fayllar").classList.contains("ochiq"))fayllar();
+    chatlarniYukla();loyihalarniYukla();
+  }
+}
+
+function tasdiqKarta(h){
+  const d=qosh("tasdiq");
+  const b=document.createElement("b");b.textContent="Ruxsat berasizmi? "+h.tavsif;d.appendChild(b);
+  if(h.ogohlantirish){const o=document.createElement("div");o.className="ogoh";o.textContent=h.ogohlantirish;d.appendChild(o)}
+  if(h.tafsilot){const p=document.createElement("pre");p.textContent=h.tafsilot;d.appendChild(p)}
+  const t=document.createElement("div");t.className="tugmalar";
+  const ha=document.createElement("button");ha.className="asosiy";ha.textContent="Ha";
+  const yoq=document.createElement("button");yoq.textContent="Yo'q";
+  t.append(ha,yoq);d.appendChild(t);pastga();
+  const javob=v=>{ha.disabled=yoq.disabled=true;(v?ha:yoq).classList.add("yoqilgan");
+    const x=document.createElement("span");x.style.cssText="align-self:center;color:var(--xira);font-size:13px";x.textContent=v?"Ruxsat berildi":"Rad etildi";t.appendChild(x);
+    oqim("/api/tasdiq",{sid,ha:v,alifbo})};
+  ha.onclick=()=>javob(true);yoq.onclick=()=>javob(false);
+}
+
+function yubor(){
+  const k=$("kirish"),m=k.value.trim();if(!m||ishlayapti)return;
+  document.querySelectorAll(".tasdiq button:not(:disabled)").forEach(b=>b.disabled=true);
+  qosh("xabar men").textContent=m;k.value="";osish();
+  oqim("/api/chat",{sid,matn:m,alifbo,loyiha,chat_id:chatId});
+}
+$("b-yubor").onclick=yubor;
+$("kirish").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();yubor()}});
+function osish(){const k=$("kirish");k.style.height="auto";k.style.height=Math.min(k.scrollHeight,200)+"px";k.style.overflowY=k.scrollHeight>200?"auto":"hidden"}
+$("kirish").addEventListener("input",osish);
+$("b-toxtat").onclick=()=>{fetch("/api/toxtat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sid})});if(boshqaruv)boshqaruv.abort()};
+$("b-yangi").onclick=()=>{if(boshqaruv)boshqaruv.abort();fetch("/api/yangi",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sid})});
+  tozala("Yangi suhbat. Savolingizni yozing.");$("kirish").focus()};
+
+async function fayllar(){
+  try{
+    const r=await (await fetch("/api/fayllar")).json();
+    $("ish-yol").textContent=r.ish;const rr=$("royxat");rr.innerHTML="";
+    if(!r.fayllar.length)rr.textContent="(bo'sh)";
+    for(const f of r.fayllar){
+      const d=document.createElement("div");d.className="f "+(f.papka?"papka":"fayl");
+      d.style.paddingLeft=(4+f.chuqur*14)+"px";
+      const nom=f.yol.split("/").pop();
+      d.textContent=(f.papka?"📁 ":"📄 ")+nom+(f.papka?"":"  · "+hajm(f.hajm));d.title=f.yol;
+      if(!f.papka)d.onclick=()=>korish(f.yol);
+      rr.appendChild(d);
+    }
+  }catch(e){$("royxat").textContent="Ro'yxatni olib bo'lmadi"}
+}
+function hajm(b){return b<1024?b+" B":b<1048576?(b/1024).toFixed(1)+" KB":(b/1048576).toFixed(1)+" MB"}
+async function korish(y){
+  const k=$("korish");k.style.display="block";k.textContent="…";
+  if(/\.(docx|xlsx|pptx)$/i.test(y)){k.textContent="";const a=document.createElement("a");a.href="/api/yuklash?yol="+encodeURIComponent(y);a.textContent="⬇ Yuklab olish: "+y.split("/").pop();a.setAttribute("download","");k.appendChild(a);return}
+  try{const r=await (await fetch("/api/fayl?yol="+encodeURIComponent(y))).json();k.textContent=y+"\n\n"+(r.matn??r.xato)}catch(e){k.textContent="Ochib bo'lmadi"}
+}
+$("b-fayllar").onclick=()=>{const f=$("fayllar");f.classList.toggle("ochiq");$("b-fayllar").classList.toggle("yoqilgan",f.classList.contains("ochiq"));if(f.classList.contains("ochiq"))fayllar()};
+$("b-yangila").onclick=fayllar;
+
+function chatIdQoy(id){chatId=id;try{id?sessionStorage.setItem("chatId",id):sessionStorage.removeItem("chatId")}catch(e){}}
+function tozala(xabar){log.innerHTML='<div class="bosh" id="bosh">'+xabar+'</div>';joriy=null;joriyMatn="";chatIdQoy(null);kontekstQoy(null);chatlarniYukla()}
+function kontekstQoy(k){const e=$("kontekst");if(!k){e.textContent="";e.classList.remove("to");return}
+  e.textContent="Kontekst ~"+k.n+" / "+k.chegara;e.classList.toggle("to",k.n>=0.85*k.chegara)}
+async function jget(u){const r=await fetch(u);const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.xato||"Xato");return j}
+async function jpost(u,b){const r=await fetch(u,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)});
+  const j=await r.json().catch(()=>({}));if(!r.ok){const e=new Error(j.xato||"Xato");e.j=j;throw e}return j}
+
+async function loyihalarniYukla(){
+  try{
+    const r=await jget("/api/loyihalar");const sel=$("l-tanla");sel.innerHTML="";
+    for(const l of r.loyihalar){const o=document.createElement("option");o.value=l.nom;o.textContent=l.nom+" ("+l.chat_soni+")";sel.appendChild(o)}
+    if(!r.loyihalar.some(l=>l.nom===loyiha))loyiha=r.loyihalar.length?r.loyihalar[0].nom:"";
+    sel.value=loyiha;saq.yoz("loyiha",loyiha);
+  }catch(e){}
+}
+async function chatlarniYukla(){
+  const box=$("l-chatlar");
+  if(!loyiha){box.textContent="";return}
+  try{
+    const r=await jget("/api/chatlar?loyiha="+encodeURIComponent(loyiha));
+    box.innerHTML="";$("l-son").textContent=r.chatlar.length+" / 20";
+    if(!r.chatlar.length){box.textContent="(hali suhbat yo'q)";return}
+    for(const c of r.chatlar){
+      const d=document.createElement("div");d.className="ch"+(c.id===chatId?" joriy":"");
+      const t=document.createElement("div");t.textContent=c.sarlavha;t.title=c.sarlavha;
+      const k=document.createElement("small");k.textContent=c.yangilandi+" · "+c.xabar_soni+" xabar";
+      d.append(t,k);d.onclick=()=>chatOchish(c.id);box.appendChild(d);
+    }
+  }catch(e){box.textContent=e.message}
+}
+async function chatOchish(id){
+  if(ishlayapti)return;
+  try{
+    const r=await jpost("/api/ochish",{sid,loyiha,id,alifbo});
+    log.innerHTML="";joriy=null;joriyMatn="";chatIdQoy(r.id);
+    for(const x of r.korinish){
+      if(x.rol==="men")qosh("xabar men").textContent=x.matn;
+      else if(x.rol==="model")qosh("xabar model",md(x.matn));
+      else qosh("xabar vosita").textContent=x.matn;
+    }
+    kontekstQoy(r.kontekst);chatlarniYukla();pastga();
+  }catch(e){chatIdQoy(null);qosh("xabar xato").textContent=e.message}
+}
+$("l-tanla").onchange=async e=>{
+  if(ishlayapti){e.target.value=loyiha;return}
+  loyiha=e.target.value;saq.yoz("loyiha",loyiha);
+  fetch("/api/yangi",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({sid})});
+  tozala("Loyiha: "+loyiha+". Savolingizni yozing.");
+};
+$("l-yarat").onclick=async()=>{
+  const nom=$("l-nom").value,x=$("l-xato");x.textContent="";
+  try{const r=await jpost("/api/loyiha",{nom});$("l-nom").value="";loyiha=r.nom;saq.yoz("loyiha",loyiha);
+    await loyihalarniYukla();tozala("Yangi loyiha: "+loyiha+".")}
+  catch(e){x.textContent=e.message}
+};
+$("l-nom").addEventListener("keydown",e=>{if(e.key==="Enter")$("l-yarat").click()});
+function panel(id,knopka,kalit){const el=$(id);el.classList.toggle("ochiq");const on=el.classList.contains("ochiq");$(knopka).classList.toggle("yoqilgan",on);if(kalit)saq.yoz(kalit,on?"1":"0");return on}
+$("l-yop").onclick=()=>panel("loyihalar","b-loyiha","panel");
+$("f-yop").onclick=()=>$("b-fayllar").click();
+$("b-loyiha").onclick=()=>{if(panel("loyihalar","b-loyiha","panel"))chatlarniYukla()};
+if(saq.ol("panel",window.innerWidth>900?"1":"0")==="1"){$("loyihalar").classList.add("ochiq");$("b-loyiha").classList.add("yoqilgan")}
+
+function limitKarta(url,tana,j){
+  const d=qosh("tasdiq"),b=document.createElement("b");
+  b.textContent="Bu loyihada 20 ta suhbat bor. Eng eskisi «"+j.eng_eski.sarlavha+"» arxiv papkasiga chetga olinsinmi? (O'chirilmaydi, faylda qoladi.)";d.appendChild(b);
+  const t=document.createElement("div");t.className="tugmalar";
+  const ha=document.createElement("button");ha.className="asosiy";ha.textContent="Ha";
+  const yoq=document.createElement("button");yoq.textContent="Yo'q";t.append(ha,yoq);d.appendChild(t);pastga();
+  ha.onclick=async()=>{ha.disabled=yoq.disabled=true;
+    try{await jpost("/api/arxivla",{loyiha,id:j.eng_eski.id});await chatlarniYukla();oqim(url,tana)}
+    catch(e){qosh("xabar xato").textContent=e.message}};
+  yoq.onclick=()=>{ha.disabled=yoq.disabled=true;qosh("xabar ogoh").textContent="Yangi suhbat ochilmadi. Chap tomondan eski suhbatni tanlang."};
+}
+
+$("b-xulosa").onclick=async()=>{
+  if(ishlayapti)return;
+  if(!chatId){qosh("xabar ogoh").textContent="Avval suhbat boshlang yoki chap tomondan tanlang.";return}
+  holatQoy(true);const k=qosh("kutish");k.textContent="Xulosa yozilyapti (1 daqiqagacha)";
+  try{
+    const r=await jpost("/api/xulosa",{sid});k.remove();
+    qosh("xabar vosita").textContent="✓ Xulosa qo'shildi ("+r.soz+" so'z). Oxirgi "+r.qoldi+" xabar to'liq qoldi.\n"+r.matn+
+      (r.soz>r.limit?"\n⚠ Xulosa "+r.limit+" so'zdan oshdi — «Xotira» oynasida qisqartiring.":"");
+    kontekstQoy(r.kontekst);
+  }catch(e){k.remove();qosh("xabar xato").textContent=e.message}
+  finally{holatQoy(false)}
+};
+
+function sana(tur){const ta=$("t-"+tur),m=ta.value.trim(),n=m?m.split(/\s+/).length:0,l=+ta.dataset.limit||0,e=$("n-"+tur);
+  e.textContent=n+" / "+l+" so'z";e.classList.toggle("qizil",n>l)}
+async function xotiraYukla(tur){
+  const ta=$("t-"+tur);$("m-"+tur).textContent="";
+  try{const r=await jget("/api/xotira?tur="+tur+"&loyiha="+encodeURIComponent(loyiha));ta.value=r.matn;ta.dataset.limit=r.limit;ta.disabled=false;sana(tur)}
+  catch(e){ta.value="";ta.disabled=true;$("m-"+tur).textContent=e.message}
+}
+async function xotiraSaqla(tur){
+  try{await jpost("/api/xotira",{tur,loyiha,matn:$("t-"+tur).value});$("m-"+tur).textContent="✓ Saqlandi";
+    kontekstQoy(await jget("/api/kontekst?sid="+encodeURIComponent(sid)))}
+  catch(e){$("m-"+tur).textContent="✗ "+e.message}
+}
+$("b-xotira").onclick=()=>{$("modal").classList.add("ochiq");$("m-nom").textContent=loyiha;xotiraYukla("umumiy");xotiraYukla("loyiha")};
+$("m-yop").onclick=()=>$("modal").classList.remove("ochiq");
+$("modal").addEventListener("click",e=>{if(e.target===$("modal"))$("modal").classList.remove("ochiq")});
+for(const t of ["umumiy","loyiha"]){$("t-"+t).addEventListener("input",()=>sana(t));$("s-"+t).onclick=()=>xotiraSaqla(t)}
+
+(async()=>{await loyihalarniYukla();await chatlarniYukla();if(chatId&&loyiha)await chatOchish(chatId)})();
+fetch("/api/holat").then(r=>r.json()).then(h=>{$("holat").textContent=(h.ollama?"● ":"○ ")+h.model+(h.ollama?"":" — Ollama topilmadi");$("holat").style.color=h.ollama?"var(--yashil)":"var(--qizil)"}).catch(()=>{$("holat").textContent="server javob bermadi"});
+$("kirish").focus();
+})();
+</script>
+</body>
+</html>
